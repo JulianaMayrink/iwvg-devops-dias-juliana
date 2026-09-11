@@ -1,0 +1,46 @@
+package es.upm.miw.devops.functionaltests;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
+
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient
+@ActiveProfiles("test")
+class UserResourceFT {
+
+    private static final String USERS = "/users";
+    private static final UUID EXISTING_USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private static final UUID UNKNOWN_USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000999");
+
+    @Autowired
+    private WebTestClient webTestClient;
+
+    @Test
+    void testReadExistingUser() {
+        webTestClient.get()
+                .uri(USERS + "/{id}", EXISTING_USER_ID)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(EXISTING_USER_ID.toString())
+                .jsonPath("$.firstName").isEqualTo("Ana")
+                .jsonPath("$.familyName").isEqualTo("Garcia");
+    }
+
+    @Test
+    void testReadUnknownUser() {
+        webTestClient.get()
+                .uri(USERS + "/{id}", UNKNOWN_USER_ID)
+                .exchange()
+                .expectStatus().isEqualTo(NOT_FOUND);
+    }
+}
