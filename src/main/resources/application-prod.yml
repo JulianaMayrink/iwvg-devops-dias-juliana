@@ -1,2 +1,17 @@
 server:
   port: 10000
+
+logging:
+  level:
+    root: WARN
+    es.upm.miw: INFO
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgres:5432/iwvgdevopsdb
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}

@@ -8,15 +8,8 @@ spring:
     type: none
   jackson:
     default-property-inclusion: NON_NULL
-  datasource:
-    url: jdbc:h2:mem:devopsdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ""
   jpa:
-    hibernate:
-      ddl-auto: create-drop
-    database-platform: org.hibernate.dialect.H2Dialect
+    open-in-view: false
 
 info:
   app:
