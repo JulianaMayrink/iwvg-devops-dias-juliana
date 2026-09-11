@@ -12,16 +12,20 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 public class ApiExceptionHandler {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({
-            NoResourceFoundException.class,
-            ResponseStatusException.class
-
-    })
+    @ExceptionHandler(NoResourceFoundException.class)
     @ResponseBody
     public ErrorMessage noResourceFoundRequest(Exception exception) {
         return new ErrorMessage(new RuntimeException(
                 "Ruta no encontrada. Prueba con: **/actuator/info o **/swagger-ui.html o **/v3/api-docs o **/v3/api-docs.yaml"),
                 HttpStatus.NOT_FOUND.value());
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<ErrorMessage> responseStatus(ResponseStatusException exception) {
+        return org.springframework.http.ResponseEntity
+                .status(exception.getStatusCode())
+                .body(new ErrorMessage(new RuntimeException(exception.getReason()), exception.getStatusCode().value()));
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
