@@ -8,6 +8,8 @@ spring:
     type: none
   jackson:
     default-property-inclusion: NON_NULL
+  jpa:
+    open-in-view: false
 
 info:
   app:
