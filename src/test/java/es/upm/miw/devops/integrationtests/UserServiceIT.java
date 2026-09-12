@@ -98,4 +98,38 @@ class UserServiceIT {
                     assertThat(responseStatusException.getStatusCode()).isEqualTo(NOT_FOUND);
                 });
     }
+
+    @Test
+    void testUpdateActiveExistingUser() {
+        User user = this.userRepository.save(User.builder()
+                .id(UUID.fromString("00000000-0000-0000-0000-000000000101"))
+                .firstName("Temporary")
+                .familyName("User")
+                .email("temporary.active@example.com")
+                .identity("10000001E")
+                .address("Calle Temporal 3")
+                .city("Madrid")
+                .province(Province.MADRID)
+                .postalCode("28001")
+                .role(Role.CUSTOMER)
+                .active(true)
+                .build());
+
+        User updated = this.userService.updateActive(user.getId(), false);
+
+        assertThat(updated.getActive()).isFalse();
+        assertThat(this.userRepository.findById(user.getId()).orElseThrow().getActive()).isFalse();
+
+        this.userRepository.deleteById(user.getId());
+    }
+
+    @Test
+    void testUpdateActiveUnknownUserThrowsNotFound() {
+        assertThatThrownBy(() -> this.userService.updateActive(UNKNOWN_USER_ID, false))
+                .isInstanceOf(ResponseStatusException.class)
+                .satisfies(exception -> {
+                    ResponseStatusException responseStatusException = (ResponseStatusException) exception;
+                    assertThat(responseStatusException.getStatusCode()).isEqualTo(NOT_FOUND);
+                });
+    }
 }

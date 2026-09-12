@@ -105,4 +105,44 @@ class UserResourceFT {
                 .exchange()
                 .expectStatus().isEqualTo(NOT_FOUND);
     }
+
+    @Test
+    void testUpdateActiveExistingUser() {
+        User user = this.userRepository.save(User.builder()
+                .id(UUID.fromString("00000000-0000-0000-0000-000000000201"))
+                .firstName("Temporary")
+                .familyName("User")
+                .email("temporary.put@example.com")
+                .identity("20000001F")
+                .address("Calle Temporal 4")
+                .city("Barcelona")
+                .province(Province.BARCELONA)
+                .postalCode("08001")
+                .role(Role.CUSTOMER)
+                .active(true)
+                .build());
+
+        webTestClient.put()
+                .uri(USERS + "/{id}/active", user.getId())
+                .bodyValue("{\"active\":false}")
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.active").isEqualTo(false);
+
+        assertThat(this.userRepository.findById(user.getId()).orElseThrow().getActive()).isFalse();
+
+        this.userRepository.deleteById(user.getId());
+    }
+
+    @Test
+    void testUpdateActiveUnknownUser() {
+        webTestClient.put()
+                .uri(USERS + "/{id}/active", UNKNOWN_USER_ID)
+                .bodyValue("{\"active\":false}")
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus().isEqualTo(NOT_FOUND);
+    }
 }
