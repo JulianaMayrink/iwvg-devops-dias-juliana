@@ -34,4 +34,10 @@ public class UserService {
         User user = this.read(id);
         this.userRepository.delete(user);
     }
+
+    public User updateActive(UUID id, boolean active) {
+        User user = this.read(id);
+        user.setActive(active);
+        return this.userRepository.save(user);
+    }
 }
