@@ -3,10 +3,13 @@ package es.upm.miw.devops.rest;
 import es.upm.miw.devops.rest.dto.UserDto;
 import es.upm.miw.devops.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -32,5 +35,11 @@ public class UserResource {
     @GetMapping(USER_ID)
     public UserDto read(@PathVariable UUID id) {
         return UserDto.fromUser(this.userService.read(id));
+    }
+
+    @DeleteMapping(USER_ID)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable UUID id) {
+        this.userService.delete(id);
     }
 }

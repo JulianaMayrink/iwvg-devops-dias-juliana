@@ -29,4 +29,9 @@ public class UserService {
                 .filter(user -> user.isBillable() == billable)
                 .toList();
     }
+
+    public void delete(UUID id) {
+        User user = this.read(id);
+        this.userRepository.delete(user);
+    }
 }
