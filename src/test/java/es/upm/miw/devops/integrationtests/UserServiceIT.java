@@ -1,6 +1,9 @@
 package es.upm.miw.devops.integrationtests;
 
+import es.upm.miw.devops.domain.model.Province;
+import es.upm.miw.devops.domain.model.Role;
 import es.upm.miw.devops.domain.model.User;
+import es.upm.miw.devops.persistence.UserRepository;
 import es.upm.miw.devops.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,9 @@ class UserServiceIT {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     void testReadExistingUser() {
@@ -60,5 +66,36 @@ class UserServiceIT {
     void testFindNotBillableReturnsOnlyNonBillableUsers() {
         List<User> users = this.userService.find(false);
         assertThat(users).allSatisfy(user -> assertThat(user.isBillable()).isFalse());
+    }
+
+    @Test
+    void testDeleteExistingUser() {
+        User user = this.userRepository.save(User.builder()
+                .id(UUID.fromString("00000000-0000-0000-0000-000000000100"))
+                .firstName("Temporary")
+                .familyName("User")
+                .email("temporary.user@example.com")
+                .identity("10000000C")
+                .address("Calle Temporal 1")
+                .city("Madrid")
+                .province(Province.MADRID)
+                .postalCode("28001")
+                .role(Role.CUSTOMER)
+                .active(true)
+                .build());
+
+        this.userService.delete(user.getId());
+
+        assertThat(this.userRepository.findById(user.getId())).isEmpty();
+    }
+
+    @Test
+    void testDeleteUnknownUserThrowsNotFound() {
+        assertThatThrownBy(() -> this.userService.delete(UNKNOWN_USER_ID))
+                .isInstanceOf(ResponseStatusException.class)
+                .satisfies(exception -> {
+                    ResponseStatusException responseStatusException = (ResponseStatusException) exception;
+                    assertThat(responseStatusException.getStatusCode()).isEqualTo(NOT_FOUND);
+                });
     }
 }
