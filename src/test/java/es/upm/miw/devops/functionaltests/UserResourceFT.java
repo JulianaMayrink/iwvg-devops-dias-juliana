@@ -43,4 +43,26 @@ class UserResourceFT {
                 .exchange()
                 .expectStatus().isEqualTo(NOT_FOUND);
     }
+
+    @Test
+    void testFindBillableUsers() {
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder.path(USERS).queryParam("billable", "true").build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(2)
+                .jsonPath("$[0].firstName").isEqualTo("Ana")
+                .jsonPath("$[1].firstName").isEqualTo("Luis");
+    }
+
+    @Test
+    void testFindAllUsersWithoutFilter() {
+        webTestClient.get()
+                .uri(USERS)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(2);
+    }
 }
