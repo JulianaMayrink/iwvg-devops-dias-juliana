@@ -3,8 +3,8 @@
 > Este proyecto es un apoyo docente de la asignatura.
 
 ### Estado del código
-[![DevOps](https://github.com/JulianaMayrink/iwvg-devops-dias-juliana/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/JulianaMayrink/iwvg-devops-dias-juliana/actions/workflows/continuous-integration.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=julianamayrink_iwvg-devops-dias-juliana&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=julianamayrink_iwvg-devops-dias-juliana)
+[![CI iwvg-devops](https://github.com/JulianaMayrink/iwvg-devops-dias-juliana/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/JulianaMayrink/iwvg-devops-dias-juliana/actions/workflows/continuous-integration.yml)
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=julianamayrink_iwvg-devops-dias-juliana&metric=alert_status&token=4cc4d377afbe61c1f053f85a35d36fe7c049a7b2)](https://sonarcloud.io/summary/new_code?id=julianamayrink_iwvg-devops-dias-juliana)
 [![Render broken](https://iwvg-devops-latest.onrender.com/version-badge)](https://iwvg-devops-latest.onrender.com/swagger-ui.html)
 
 
