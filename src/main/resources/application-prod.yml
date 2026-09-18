@@ -6,6 +6,12 @@ logging:
     root: WARN
     es.upm.miw: INFO
 
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
 spring:
   jpa:
     hibernate:
