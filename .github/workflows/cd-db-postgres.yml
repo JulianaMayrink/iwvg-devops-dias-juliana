@@ -16,6 +16,8 @@ jobs:
           host: ${{ secrets.AWS_LIGHTSAIL_IP_MAIN }}
           username: ${{ secrets.AWS_LIGHTSAIL_USER_MAIN }}
           key: ${{ secrets.AWS_LIGHTSAIL_SSH_KEY_MAIN }}
+          timeout: 120s
+          command_timeout: 10m
           script: |
             docker rm -f postgres || true
             docker network create devops || true
