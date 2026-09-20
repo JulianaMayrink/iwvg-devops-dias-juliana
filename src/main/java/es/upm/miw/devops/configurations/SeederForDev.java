@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-@Profile({"dev", "test"})
+@Profile({"dev", "pre", "prod", "test"})
 public class SeederForDev implements ApplicationRunner {
 
     private final UserRepository userRepository;
