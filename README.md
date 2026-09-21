@@ -4,7 +4,7 @@
 
 ### Estado del código
 [![CI iwvg-devops](https://github.com/JulianaMayrink/iwvg-devops-dias-juliana/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/JulianaMayrink/iwvg-devops-dias-juliana/actions/workflows/continuous-integration.yml)
-[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=julianamayrink_iwvg-devops-dias-juliana&metric=alert_status&token=4cc4d377afbe61c1f053f85a35d36fe7c049a7b2)](https://sonarcloud.io/summary/new_code?id=julianamayrink_iwvg-devops-dias-juliana)
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=julianamayrink_iwvg-devops-dias-juliana&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=julianamayrink_iwvg-devops-dias-juliana)
 [![AWS](http://3.123.36.203:8080/version-badge)](http://3.123.36.203:8080)
 
 
