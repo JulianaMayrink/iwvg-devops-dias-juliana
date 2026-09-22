@@ -64,6 +64,12 @@ public class UserService {
         user.setProvince(updatedUser.getProvince());
         user.setPostalCode(updatedUser.getPostalCode());
         user.setRole(updatedUser.getRole());
+        if (updatedUser.getActive() != null) {
+            if (!updatedUser.getActive() && user.getRole() == Role.ADMIN) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Admin user cannot be deactivated: " + id);
+            }
+            user.setActive(updatedUser.getActive());
+        }
         return this.userRepository.save(user);
     }
 }
