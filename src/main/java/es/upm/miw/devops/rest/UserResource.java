@@ -6,6 +6,7 @@ import es.upm.miw.devops.rest.dto.UserActiveRequest;
 import es.upm.miw.devops.rest.dto.UserDto;
 import es.upm.miw.devops.rest.dto.UserUpdateRequest;
 import es.upm.miw.devops.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -57,7 +58,7 @@ public class UserResource {
     }
 
     @PutMapping(USER_ID)
-    public UserDto update(@PathVariable UUID id, @RequestBody UserUpdateRequest request) {
+    public UserDto update(@PathVariable UUID id, @RequestBody @Valid UserUpdateRequest request) {
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .familyName(request.getFamilyName())
