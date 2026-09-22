@@ -297,6 +297,51 @@ class UserResourceFT {
     }
 
     @Test
+    void testUpdateWithActiveField() {
+        User user = this.userRepository.save(User.builder()
+                .id(UUID.fromString("00000000-0000-0000-0000-000000000204"))
+                .firstName("Temporary")
+                .familyName("User")
+                .email("temporary.putactive@example.com")
+                .identity("20000005M")
+                .address("Calle Temporal 9")
+                .city("Madrid")
+                .province(Province.MADRID)
+                .postalCode("28001")
+                .role(Role.CUSTOMER)
+                .active(true)
+                .build());
+
+        String body = """
+                {
+                  "firstName": "Updated",
+                  "familyName": "Name",
+                  "email": "updated@example.com",
+                  "identity": "20000003J",
+                  "address": "Calle Nueva 2",
+                  "city": "Barcelona",
+                  "province": "BARCELONA",
+                  "postalCode": "08001",
+                  "role": "CUSTOMER",
+                  "active": false
+                }
+                """;
+
+        webTestClient.put()
+                .uri(USERS + "/{id}", user.getId())
+                .bodyValue(body)
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.active").isEqualTo(false);
+
+        assertThat(this.userRepository.findById(user.getId()).orElseThrow().getActive()).isFalse();
+
+        this.userRepository.deleteById(user.getId());
+    }
+
+    @Test
     void testDeactivateAdminConflict() {
         webTestClient.put()
                 .uri(USERS + "/{id}/active", EXISTING_USER_ID)

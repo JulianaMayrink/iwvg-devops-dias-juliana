@@ -34,4 +34,5 @@ public class UserUpdateRequest {
     private String postalCode;
     @NotNull
     private Role role;
+    private Boolean active;
 }

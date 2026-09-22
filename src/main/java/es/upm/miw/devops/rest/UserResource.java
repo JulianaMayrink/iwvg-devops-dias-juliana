@@ -69,6 +69,7 @@ public class UserResource {
                 .province(request.getProvince())
                 .postalCode(request.getPostalCode())
                 .role(request.getRole())
+                .active(request.getActive())
                 .build();
         return UserDto.fromUser(this.userService.update(id, user));
     }
