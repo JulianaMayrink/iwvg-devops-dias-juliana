@@ -216,4 +216,41 @@ class UserResourceFT {
                 .exchange()
                 .expectStatus().isEqualTo(NOT_FOUND);
     }
+
+    @Test
+    void testUpdateActiveBatch() {
+        User user = this.userRepository.save(User.builder()
+                .id(UUID.fromString("00000000-0000-0000-0000-000000000203"))
+                .firstName("Temporary")
+                .familyName("User")
+                .email("temporary.batch@example.com")
+                .identity("20000004L")
+                .address("Calle Temporal 8")
+                .city("Madrid")
+                .province(Province.MADRID)
+                .postalCode("28001")
+                .role(Role.CUSTOMER)
+                .active(true)
+                .build());
+
+        String body = """
+                [
+                  {"id": "%s", "active": false}
+                ]
+                """.formatted(user.getId());
+
+        webTestClient.patch()
+                .uri(USERS)
+                .bodyValue(body)
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(1)
+                .jsonPath("$[0].active").isEqualTo(false);
+
+        assertThat(this.userRepository.findById(user.getId()).orElseThrow().getActive()).isFalse();
+
+        this.userRepository.deleteById(user.getId());
+    }
 }

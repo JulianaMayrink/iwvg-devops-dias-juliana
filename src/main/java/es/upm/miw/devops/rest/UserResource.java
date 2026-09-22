@@ -1,6 +1,7 @@
 package es.upm.miw.devops.rest;
 
 import es.upm.miw.devops.domain.model.User;
+import es.upm.miw.devops.rest.dto.UserActiveItem;
 import es.upm.miw.devops.rest.dto.UserActiveRequest;
 import es.upm.miw.devops.rest.dto.UserDto;
 import es.upm.miw.devops.rest.dto.UserUpdateRequest;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -68,5 +70,18 @@ public class UserResource {
                 .role(request.getRole())
                 .build();
         return UserDto.fromUser(this.userService.update(id, user));
+    }
+
+    @PatchMapping
+    public List<UserDto> updateActiveBatch(@RequestBody List<UserActiveItem> request) {
+        List<User> users = request.stream()
+                .map(item -> User.builder()
+                        .id(item.getId())
+                        .active(item.getActive())
+                        .build())
+                .toList();
+        return this.userService.updateActiveBatch(users).stream()
+                .map(UserDto::fromUser)
+                .toList();
     }
 }
