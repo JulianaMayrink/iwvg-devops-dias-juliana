@@ -14,6 +14,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -253,6 +254,30 @@ class UserResourceFT {
         assertThat(this.userRepository.findById(user.getId()).orElseThrow().getActive()).isFalse();
 
         this.userRepository.deleteById(user.getId());
+    }
+
+    @Test
+    void testUpdateWithInvalidBodyReturnsBadRequest() {
+        String invalidBody = """
+                {
+                  "firstName": "",
+                  "familyName": "Name",
+                  "email": "not-an-email",
+                  "identity": "20000003J",
+                  "address": "Calle Nueva 2",
+                  "city": "Barcelona",
+                  "province": "BARCELONA",
+                  "postalCode": "08001",
+                  "role": "ADMIN"
+                }
+                """;
+
+        webTestClient.put()
+                .uri(USERS + "/{id}", EXISTING_USER_ID)
+                .bodyValue(invalidBody)
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus().isEqualTo(BAD_REQUEST);
     }
 
     @Test
