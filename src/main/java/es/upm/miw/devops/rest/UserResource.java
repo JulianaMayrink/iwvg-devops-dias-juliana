@@ -6,6 +6,7 @@ import es.upm.miw.devops.rest.dto.UserActiveRequest;
 import es.upm.miw.devops.rest.dto.UserDto;
 import es.upm.miw.devops.rest.dto.UserUpdateRequest;
 import es.upm.miw.devops.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -52,12 +53,12 @@ public class UserResource {
     }
 
     @PutMapping(USER_ID_ACTIVE)
-    public UserDto updateActive(@PathVariable UUID id, @RequestBody UserActiveRequest request) {
+    public UserDto updateActive(@PathVariable UUID id, @RequestBody @Valid UserActiveRequest request) {
         return UserDto.fromUser(this.userService.updateActive(id, request.getActive()));
     }
 
     @PutMapping(USER_ID)
-    public UserDto update(@PathVariable UUID id, @RequestBody UserUpdateRequest request) {
+    public UserDto update(@PathVariable UUID id, @RequestBody @Valid UserUpdateRequest request) {
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .familyName(request.getFamilyName())
@@ -68,12 +69,13 @@ public class UserResource {
                 .province(request.getProvince())
                 .postalCode(request.getPostalCode())
                 .role(request.getRole())
+                .active(request.getActive())
                 .build();
         return UserDto.fromUser(this.userService.update(id, user));
     }
 
     @PatchMapping
-    public List<UserDto> updateActiveBatch(@RequestBody List<UserActiveItem> request) {
+    public List<UserDto> updateActiveBatch(@RequestBody @Valid List<UserActiveItem> request) {
         List<User> users = request.stream()
                 .map(item -> User.builder()
                         .id(item.getId())
