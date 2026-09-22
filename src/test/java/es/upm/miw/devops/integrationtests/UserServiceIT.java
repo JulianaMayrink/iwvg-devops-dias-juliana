@@ -225,6 +225,39 @@ class UserServiceIT {
     }
 
     @Test
+    void testUpdateActiveBatchIsAtomic() {
+        User user = this.userRepository.save(User.builder()
+                .id(UUID.fromString("00000000-0000-0000-0000-000000000105"))
+                .firstName("Temporary")
+                .familyName("User")
+                .email("temporary.atomic@example.com")
+                .identity("10000006N")
+                .address("Calle Atomic 1")
+                .city("Madrid")
+                .province(Province.MADRID)
+                .postalCode("28001")
+                .role(Role.CUSTOMER)
+                .active(true)
+                .build());
+
+        List<User> batch = List.of(
+                User.builder().id(user.getId()).active(false).build(),
+                User.builder().id(UNKNOWN_USER_ID).active(false).build());
+
+        assertThatThrownBy(() -> this.userService.updateActiveBatch(batch))
+                .isInstanceOf(ResponseStatusException.class)
+                .satisfies(exception -> {
+                    ResponseStatusException responseStatusException = (ResponseStatusException) exception;
+                    assertThat(responseStatusException.getStatusCode()).isEqualTo(NOT_FOUND);
+                });
+
+        // Atomicity: the existing user must remain active (rollback)
+        assertThat(this.userRepository.findById(user.getId()).orElseThrow().getActive()).isTrue();
+
+        this.userRepository.deleteById(user.getId());
+    }
+
+    @Test
     void testDeactivateAdminThrowsConflict() {
         User admin = this.userRepository.save(User.builder()
                 .id(UUID.fromString("00000000-0000-0000-0000-000000000104"))

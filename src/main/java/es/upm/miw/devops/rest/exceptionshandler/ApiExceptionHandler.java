@@ -1,6 +1,7 @@
 package es.upm.miw.devops.rest.exceptionshandler;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -26,6 +27,17 @@ public class ApiExceptionHandler {
         return org.springframework.http.ResponseEntity
                 .status(exception.getStatusCode())
                 .body(new ErrorMessage(new RuntimeException(exception.getReason()), exception.getStatusCode().value()));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseBody
+    public ErrorMessage methodArgumentNotValid(MethodArgumentNotValidException exception) {
+        String message = exception.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("Validation failed");
+        return new ErrorMessage(new RuntimeException(message), HttpStatus.BAD_REQUEST.value());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

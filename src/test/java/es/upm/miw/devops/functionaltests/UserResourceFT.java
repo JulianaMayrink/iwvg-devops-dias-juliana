@@ -14,6 +14,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -249,6 +250,91 @@ class UserResourceFT {
                 .expectBody()
                 .jsonPath("$.length()").isEqualTo(1)
                 .jsonPath("$[0].active").isEqualTo(false);
+
+        assertThat(this.userRepository.findById(user.getId()).orElseThrow().getActive()).isFalse();
+
+        this.userRepository.deleteById(user.getId());
+    }
+
+    @Test
+    void testUpdateWithInvalidBodyReturnsBadRequest() {
+        String invalidBody = """
+                {
+                  "firstName": "",
+                  "familyName": "Name",
+                  "email": "not-an-email",
+                  "identity": "20000003J",
+                  "address": "Calle Nueva 2",
+                  "city": "Barcelona",
+                  "province": "BARCELONA",
+                  "postalCode": "08001",
+                  "role": "ADMIN"
+                }
+                """;
+
+        webTestClient.put()
+                .uri(USERS + "/{id}", EXISTING_USER_ID)
+                .bodyValue(invalidBody)
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus().isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void testUpdateActiveBatchWithNullActiveReturnsBadRequest() {
+        String body = """
+                [
+                  {"id": "%s", "active": null}
+                ]
+                """.formatted(EXISTING_USER_ID);
+
+        webTestClient.patch()
+                .uri(USERS)
+                .bodyValue(body)
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus().isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void testUpdateWithActiveField() {
+        User user = this.userRepository.save(User.builder()
+                .id(UUID.fromString("00000000-0000-0000-0000-000000000204"))
+                .firstName("Temporary")
+                .familyName("User")
+                .email("temporary.putactive@example.com")
+                .identity("20000005M")
+                .address("Calle Temporal 9")
+                .city("Madrid")
+                .province(Province.MADRID)
+                .postalCode("28001")
+                .role(Role.CUSTOMER)
+                .active(true)
+                .build());
+
+        String body = """
+                {
+                  "firstName": "Updated",
+                  "familyName": "Name",
+                  "email": "updated@example.com",
+                  "identity": "20000003J",
+                  "address": "Calle Nueva 2",
+                  "city": "Barcelona",
+                  "province": "BARCELONA",
+                  "postalCode": "08001",
+                  "role": "CUSTOMER",
+                  "active": false
+                }
+                """;
+
+        webTestClient.put()
+                .uri(USERS + "/{id}", user.getId())
+                .bodyValue(body)
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.active").isEqualTo(false);
 
         assertThat(this.userRepository.findById(user.getId()).orElseThrow().getActive()).isFalse();
 
