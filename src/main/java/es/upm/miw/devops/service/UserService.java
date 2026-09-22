@@ -1,5 +1,6 @@
 package es.upm.miw.devops.service;
 
+import es.upm.miw.devops.domain.model.Role;
 import es.upm.miw.devops.domain.model.User;
 import es.upm.miw.devops.persistence.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,9 @@ public class UserService {
 
     public User updateActive(UUID id, boolean active) {
         User user = this.read(id);
+        if (!active && user.getRole() == Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Admin user cannot be deactivated: " + id);
+        }
         user.setActive(active);
         return this.userRepository.save(user);
     }
