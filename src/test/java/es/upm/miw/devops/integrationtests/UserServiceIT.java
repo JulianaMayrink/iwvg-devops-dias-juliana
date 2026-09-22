@@ -223,4 +223,32 @@ class UserServiceIT {
 
         this.userRepository.deleteById(user.getId());
     }
+
+    @Test
+    void testDeactivateAdminThrowsConflict() {
+        User admin = this.userRepository.save(User.builder()
+                .id(UUID.fromString("00000000-0000-0000-0000-000000000104"))
+                .firstName("Admin")
+                .familyName("User")
+                .email("admin.block@example.com")
+                .identity("10000005M")
+                .address("Calle Admin 1")
+                .city("Madrid")
+                .province(Province.MADRID)
+                .postalCode("28001")
+                .role(Role.ADMIN)
+                .active(true)
+                .build());
+
+        assertThatThrownBy(() -> this.userService.updateActive(admin.getId(), false))
+                .isInstanceOf(ResponseStatusException.class)
+                .satisfies(exception -> {
+                    ResponseStatusException responseStatusException = (ResponseStatusException) exception;
+                    assertThat(responseStatusException.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.CONFLICT);
+                });
+
+        assertThat(this.userRepository.findById(admin.getId()).orElseThrow().getActive()).isTrue();
+
+        this.userRepository.deleteById(admin.getId());
+    }
 }

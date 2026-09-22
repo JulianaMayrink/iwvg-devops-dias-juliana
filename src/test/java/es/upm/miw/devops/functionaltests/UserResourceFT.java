@@ -14,6 +14,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -252,5 +253,15 @@ class UserResourceFT {
         assertThat(this.userRepository.findById(user.getId()).orElseThrow().getActive()).isFalse();
 
         this.userRepository.deleteById(user.getId());
+    }
+
+    @Test
+    void testDeactivateAdminConflict() {
+        webTestClient.put()
+                .uri(USERS + "/{id}/active", EXISTING_USER_ID)
+                .bodyValue("{\"active\":false}")
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus().isEqualTo(CONFLICT);
     }
 }
