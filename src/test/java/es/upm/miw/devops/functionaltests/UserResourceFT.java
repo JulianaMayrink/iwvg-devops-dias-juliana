@@ -281,6 +281,22 @@ class UserResourceFT {
     }
 
     @Test
+    void testUpdateActiveBatchWithNullActiveReturnsBadRequest() {
+        String body = """
+                [
+                  {"id": "%s", "active": null}
+                ]
+                """.formatted(EXISTING_USER_ID);
+
+        webTestClient.patch()
+                .uri(USERS)
+                .bodyValue(body)
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus().isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
     void testDeactivateAdminConflict() {
         webTestClient.put()
                 .uri(USERS + "/{id}/active", EXISTING_USER_ID)

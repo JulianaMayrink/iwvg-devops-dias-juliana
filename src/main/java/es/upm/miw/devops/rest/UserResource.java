@@ -53,7 +53,7 @@ public class UserResource {
     }
 
     @PutMapping(USER_ID_ACTIVE)
-    public UserDto updateActive(@PathVariable UUID id, @RequestBody UserActiveRequest request) {
+    public UserDto updateActive(@PathVariable UUID id, @RequestBody @Valid UserActiveRequest request) {
         return UserDto.fromUser(this.userService.updateActive(id, request.getActive()));
     }
 
@@ -74,7 +74,7 @@ public class UserResource {
     }
 
     @PatchMapping
-    public List<UserDto> updateActiveBatch(@RequestBody List<UserActiveItem> request) {
+    public List<UserDto> updateActiveBatch(@RequestBody @Valid List<UserActiveItem> request) {
         List<User> users = request.stream()
                 .map(item -> User.builder()
                         .id(item.getId())
