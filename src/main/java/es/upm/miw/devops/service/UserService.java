@@ -40,4 +40,18 @@ public class UserService {
         user.setActive(active);
         return this.userRepository.save(user);
     }
+
+    public User update(UUID id, User updatedUser) {
+        User user = this.read(id);
+        user.setFirstName(updatedUser.getFirstName());
+        user.setFamilyName(updatedUser.getFamilyName());
+        user.setEmail(updatedUser.getEmail());
+        user.setIdentity(updatedUser.getIdentity());
+        user.setAddress(updatedUser.getAddress());
+        user.setCity(updatedUser.getCity());
+        user.setProvince(updatedUser.getProvince());
+        user.setPostalCode(updatedUser.getPostalCode());
+        user.setRole(updatedUser.getRole());
+        return this.userRepository.save(user);
+    }
 }

@@ -145,4 +145,75 @@ class UserResourceFT {
                 .exchange()
                 .expectStatus().isEqualTo(NOT_FOUND);
     }
+
+    @Test
+    void testUpdateExistingUser() {
+        User user = this.userRepository.save(User.builder()
+                .id(UUID.fromString("00000000-0000-0000-0000-000000000202"))
+                .firstName("Temporary")
+                .familyName("User")
+                .email("temporary.update@example.com")
+                .identity("20000002I")
+                .address("Calle Temporal 6")
+                .city("Madrid")
+                .province(Province.MADRID)
+                .postalCode("28001")
+                .role(Role.CUSTOMER)
+                .active(true)
+                .build());
+
+        String body = """
+                {
+                  "firstName": "Updated",
+                  "familyName": "Name",
+                  "email": "updated@example.com",
+                  "identity": "20000003J",
+                  "address": "Calle Nueva 2",
+                  "city": "Barcelona",
+                  "province": "BARCELONA",
+                  "postalCode": "08001",
+                  "role": "ADMIN"
+                }
+                """;
+
+        webTestClient.put()
+                .uri(USERS + "/{id}", user.getId())
+                .bodyValue(body)
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.firstName").isEqualTo("Updated")
+                .jsonPath("$.familyName").isEqualTo("Name")
+                .jsonPath("$.province").isEqualTo("BARCELONA")
+                .jsonPath("$.role").isEqualTo("ADMIN");
+
+        assertThat(this.userRepository.findById(user.getId()).orElseThrow().getFirstName()).isEqualTo("Updated");
+
+        this.userRepository.deleteById(user.getId());
+    }
+
+    @Test
+    void testUpdateUnknownUser() {
+        String body = """
+                {
+                  "firstName": "Updated",
+                  "familyName": "Name",
+                  "email": "updated@example.com",
+                  "identity": "20000003J",
+                  "address": "Calle Nueva 2",
+                  "city": "Barcelona",
+                  "province": "BARCELONA",
+                  "postalCode": "08001",
+                  "role": "ADMIN"
+                }
+                """;
+
+        webTestClient.put()
+                .uri(USERS + "/{id}", UNKNOWN_USER_ID)
+                .bodyValue(body)
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus().isEqualTo(NOT_FOUND);
+    }
 }
