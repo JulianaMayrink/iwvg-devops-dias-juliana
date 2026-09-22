@@ -6,6 +6,7 @@ import es.upm.miw.devops.persistence.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -45,6 +46,7 @@ public class UserService {
         return this.userRepository.save(user);
     }
 
+    @Transactional
     public List<User> updateActiveBatch(List<User> updatedUsers) {
         return updatedUsers.stream()
                 .map(item -> this.updateActive(item.getId(), item.getActive()))
