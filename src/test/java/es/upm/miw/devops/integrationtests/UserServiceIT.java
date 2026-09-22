@@ -132,4 +132,95 @@ class UserServiceIT {
                     assertThat(responseStatusException.getStatusCode()).isEqualTo(NOT_FOUND);
                 });
     }
+
+    @Test
+    void testUpdateExistingUser() {
+        User user = this.userRepository.save(User.builder()
+                .id(UUID.fromString("00000000-0000-0000-0000-000000000102"))
+                .firstName("Temporary")
+                .familyName("User")
+                .email("temporary.update@example.com")
+                .identity("10000002G")
+                .address("Calle Temporal 5")
+                .city("Madrid")
+                .province(Province.MADRID)
+                .postalCode("28001")
+                .role(Role.CUSTOMER)
+                .active(true)
+                .build());
+
+        User updatedUser = User.builder()
+                .firstName("Updated")
+                .familyName("Name")
+                .email("updated@example.com")
+                .identity("10000003H")
+                .address("Calle Nueva 1")
+                .city("Barcelona")
+                .province(Province.BARCELONA)
+                .postalCode("08001")
+                .role(Role.ADMIN)
+                .build();
+
+        User updated = this.userService.update(user.getId(), updatedUser);
+
+        assertThat(updated.getFirstName()).isEqualTo("Updated");
+        assertThat(updated.getFamilyName()).isEqualTo("Name");
+        assertThat(updated.getEmail()).isEqualTo("updated@example.com");
+        assertThat(updated.getProvince()).isEqualTo(Province.BARCELONA);
+        assertThat(updated.getRole()).isEqualTo(Role.ADMIN);
+
+        this.userRepository.deleteById(user.getId());
+    }
+
+    @Test
+    void testUpdateUnknownUserThrowsNotFound() {
+        User updatedUser = User.builder()
+                .firstName("Updated")
+                .familyName("Name")
+                .email("updated@example.com")
+                .identity("10000003H")
+                .address("Calle Nueva 1")
+                .city("Barcelona")
+                .province(Province.BARCELONA)
+                .postalCode("08001")
+                .role(Role.ADMIN)
+                .build();
+
+        assertThatThrownBy(() -> this.userService.update(UNKNOWN_USER_ID, updatedUser))
+                .isInstanceOf(ResponseStatusException.class)
+                .satisfies(exception -> {
+                    ResponseStatusException responseStatusException = (ResponseStatusException) exception;
+                    assertThat(responseStatusException.getStatusCode()).isEqualTo(NOT_FOUND);
+                });
+    }
+
+    @Test
+    void testUpdateActiveBatch() {
+        User user = this.userRepository.save(User.builder()
+                .id(UUID.fromString("00000000-0000-0000-0000-000000000103"))
+                .firstName("Temporary")
+                .familyName("User")
+                .email("temporary.batch@example.com")
+                .identity("10000004K")
+                .address("Calle Temporal 7")
+                .city("Madrid")
+                .province(Province.MADRID)
+                .postalCode("28001")
+                .role(Role.CUSTOMER)
+                .active(true)
+                .build());
+
+        List<User> batch = List.of(User.builder()
+                .id(user.getId())
+                .active(false)
+                .build());
+
+        List<User> updated = this.userService.updateActiveBatch(batch);
+
+        assertThat(updated).hasSize(1);
+        assertThat(updated.get(0).getActive()).isFalse();
+        assertThat(this.userRepository.findById(user.getId()).orElseThrow().getActive()).isFalse();
+
+        this.userRepository.deleteById(user.getId());
+    }
 }
