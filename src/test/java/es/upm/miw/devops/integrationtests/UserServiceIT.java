@@ -193,4 +193,34 @@ class UserServiceIT {
                     assertThat(responseStatusException.getStatusCode()).isEqualTo(NOT_FOUND);
                 });
     }
+
+    @Test
+    void testUpdateActiveBatch() {
+        User user = this.userRepository.save(User.builder()
+                .id(UUID.fromString("00000000-0000-0000-0000-000000000103"))
+                .firstName("Temporary")
+                .familyName("User")
+                .email("temporary.batch@example.com")
+                .identity("10000004K")
+                .address("Calle Temporal 7")
+                .city("Madrid")
+                .province(Province.MADRID)
+                .postalCode("28001")
+                .role(Role.CUSTOMER)
+                .active(true)
+                .build());
+
+        List<User> batch = List.of(User.builder()
+                .id(user.getId())
+                .active(false)
+                .build());
+
+        List<User> updated = this.userService.updateActiveBatch(batch);
+
+        assertThat(updated).hasSize(1);
+        assertThat(updated.get(0).getActive()).isFalse();
+        assertThat(this.userRepository.findById(user.getId()).orElseThrow().getActive()).isFalse();
+
+        this.userRepository.deleteById(user.getId());
+    }
 }

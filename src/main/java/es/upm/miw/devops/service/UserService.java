@@ -41,6 +41,12 @@ public class UserService {
         return this.userRepository.save(user);
     }
 
+    public List<User> updateActiveBatch(List<User> updatedUsers) {
+        return updatedUsers.stream()
+                .map(item -> this.updateActive(item.getId(), item.getActive()))
+                .toList();
+    }
+
     public User update(UUID id, User updatedUser) {
         User user = this.read(id);
         user.setFirstName(updatedUser.getFirstName());
